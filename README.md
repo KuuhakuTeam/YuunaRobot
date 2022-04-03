@@ -11,8 +11,8 @@
 - `API_HASH` - Get yours at [my.telegram.org](https://my.telegram.org/).
 - `BOT_TOKEN` - Get yours at [@BotFather](https://t.me/BotFather).
 - `GP_LOGS` - ID for logs group.
-- `DATABASE_URL` - Get it from [mongodb](https://mongodb.com/atlas).
-- `LASTFM_API_KEY` - Get it from [lastfm.](https://www.last.fm/join).
+- `DATABASE_URL` - Get it from [MongoDB](https://mongodb.com/atlas).
+- `LASTFM_API_KEY` - Get it from [LastFM](https://www.last.fm/join).
 
 ### Credits
 

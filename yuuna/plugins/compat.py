@@ -5,13 +5,10 @@
 # PLease read the GNU v3.0 License Agreement in 
 # <https://www.github.com/KuuhakuTeam/YuunaRobot/blob/master/LICENSE/>.
 
+# taken from <https://github.com/UsergeTeam/Userge-Plugins/blob/da006724ebc023d6a7b546b450154e05df89cdbd/plugins/utils/lastfm/__main__.py#L391>
 
-import asyncio
-import math
-import os
 import aiohttp
 
-from wget import download
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 

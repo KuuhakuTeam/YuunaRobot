@@ -47,7 +47,7 @@ async def thanks_for(c: yuuna, m: Message):
                   ),
             disable_notification=True,
         )
-        found = await GROUPS.find_one({"ID_": gp_id})
+        found = await GROUPS.find_one({"id_": gp_id})
         if not found:
             await asyncio.gather(
                 GROUPS.insert_one({"id_": gp_id, "title": gp_title}),
