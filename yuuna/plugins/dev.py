@@ -1,28 +1,29 @@
 # eval/term taken from https://github.com/lostb053/anibot
 
-import asyncio
-import traceback
 import sys
-import subprocess
 import os
 import re
 import io
+import time
+import asyncio
+import traceback
+import subprocess
 from datetime import datetime
 
 from pyrogram import filters
 from pyrogram.types import Message
 
-from yuuna import yuuna
-from yuuna.helpers import is_dev
+from yuuna import yuuna, START_TIME
+from yuuna.helpers import is_dev, time_formatter
 
 
 @yuuna.on_message(filters.command(["ping", "pingu"]))
-async def _ping(_, message: Message):
+async def ping_(_, message: Message):
     start = datetime.now()
     replied = await message.reply("𝚙𝚘𝚗𝚐!")
     end = datetime.now()
     m_s = (end - start).microseconds / 1000
-    await replied.edit(f"𝚙𝚒𝚗𝚐: `{m_s}𝚖𝚜`")
+    await replied.edit(f"𝚙𝚒𝚗𝚐: `{m_s}𝚖𝚜`\n𝚞𝚙𝚝𝚒𝚖𝚎: `{time_formatter(time.time() - START_TIME)}`")
 
 
 @yuuna.on_message(filters.command("rr"))
@@ -102,7 +103,7 @@ async def aexec(code, client, message):
     return await locals()["__aexec"](client, message)
 
 
-@yuuna.on_message(filters.command("term"))
+@yuuna.on_message(filters.command(["term", "sh"], prefixes=["/", "!"]))
 async def terminal(client: yuuna, message: Message):
     user_id = message.from_user.id
     if not is_dev(user_id):

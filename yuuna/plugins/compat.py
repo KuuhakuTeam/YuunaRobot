@@ -65,12 +65,17 @@ async def lastfm_compat_(_, message: Message):
         username = query
     else:
         return await message.reply("__I need you to enter username or reply to a message__")
-
     msg = await message.reply("__Processing..__")
     us1, us2 = user_lastfm, username
     ta = "topartists"
-    ta1 = (await recs(us1, ta, 500))[1][ta]["artist"]
-    ta2 = (await recs(us2, ta, 500))[1][ta]["artist"]
+    try:
+        ta1 = (await recs(us1, ta, 500))[1][ta]["artist"]
+    except KeyError:
+        return await msg.edit(f"__Could not find {us1} user__.")
+    try:
+        ta2 = (await recs(us2, ta, 500))[1][ta]["artist"]
+    except KeyError:
+        return await msg.edit(f"__Could not find {us2} user__.")
     ad1, ad2 = [n["name"] for n in ta1], [n["name"] for n in ta2]
     display = f"**[{us1}]({USER_LAST}{us1})** and **[{us2}]({USER_LAST}{us2})**"
     comart = [value for value in ad2 if value in ad1]

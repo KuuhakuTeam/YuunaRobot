@@ -27,7 +27,7 @@ async def now_play(c: yuuna, message: Message):
     user_ = message.from_user
     query = input_str(message)
     lastdb = await REG.find_one({"id_": user_.id})
-    if not (lastdb or query):
+    if not (lastdb or query or message.reply_to_message):
         button = InlineKeyboardMarkup(
             [
                 [
@@ -40,7 +40,14 @@ async def now_play(c: yuuna, message: Message):
         reg_ = "__Enter some username or use /set (username) to set yours. If you don't already have a LastFM account, click the button below to register.__"
         await message.reply(reg_, reply_markup=button)
         return
-    if query:
+    if message.reply_to_message:
+        userr_ = message.reply_to_message.from_user.id
+        usrdb = await REG.find_one({"id_": userr_})
+        if usrdb is None:
+            return await message.reply("__This user has not defined username__")
+        else:
+            user_lastfm = usrdb["last_data"]
+    elif query:
         user_lastfm = query
     else:
         user_lastfm = lastdb["last_data"]
