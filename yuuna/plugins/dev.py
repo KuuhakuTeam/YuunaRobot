@@ -12,10 +12,51 @@ from datetime import datetime
 
 from pyrogram import filters
 from pyrogram.types import Message
-
+from pyrogram.errors import UserIsBlocked
 from yuuna import yuuna, START_TIME
-from yuuna.helpers import is_dev, time_formatter
+from yuuna.helpers import is_dev, time_formatter, input_str, get_collection
 
+
+USERS = get_collection("USERS")
+
+
+@yuuna.on_message(filters.command(["broadcast", "bc"]))
+async def broadcasting_(_, message: Message):
+    user_id = message.from_user.id
+    if not is_dev(user_id):
+        return
+    query = input_str(message)
+    if not query:
+        return await message.reply("__I need text to broadcasting.__")
+    msg = await message.reply("__Processing ...__")
+    web_preview = False
+    sucess_br = 0
+    no_sucess = 0
+    block_num = 0
+    total_user = await USERS.estimated_document_count()
+    ulist = USERS.find()
+    if query.startswith("-d"):
+        web_preview = True
+        query_ = query.strip("-d")
+    else:
+        query_ = query
+    async for users in ulist:
+        try:
+            await yuuna.send_message(chat_id= users["id_"], text=query_, disable_web_page_preview=web_preview)
+            sucess_br += 1
+        except UserIsBlocked:
+            block_num += 1
+        except Exception:
+            no_sucess += 1
+    await asyncio.sleep(2)
+    await msg.edit(f"""
+╭─❑ 「 **Broadcast Completed** 」 ❑──
+│- __Total Users:__ `{total_user}`
+│- __Successful:__ `{sucess_br}`
+│- __Blocked:__ `{block_num}`
+│- __Failed:__ `{no_sucess}`
+╰❑
+    """)
 
 @yuuna.on_message(filters.command(["ping", "pingu"]))
 async def ping_(_, message: Message):

@@ -21,11 +21,14 @@ START_TIME = time.time()
 class YuunaRobot(Client):
     def __init__(self):
         kwargs = {
+            'name': "yuuna",
+            'app_version': version.__yuuna_version__,
             'api_id': Config.API_ID,
             'api_hash': Config.API_HASH,
-            'session_name': "Yuuna",
             'bot_token': Config.BOT_TOKEN,
-            'plugins': dict(root="yuuna/plugins/")
+            'workers': 24,
+            'in_memory': True,
+            'plugins': dict(root="yuuna.plugins")
         }
         super().__init__(**kwargs)
 
@@ -37,10 +40,10 @@ class YuunaRobot(Client):
         print("Yuuna is playing now '-'...")
 
     async def stop(self):
-        text_ = f"#Yuuna #sleep\n\n__Yuuna went sleep.__"
+        text_ = f"#Yuuna #Logs\n\n__Yuuna will change batteries.__"
         await self.send_message(chat_id=Config.GP_LOGS, text=text_)
         await super().stop()
-        print("Yuuna esta descançando...")
+        print("Yuuna will change batteries ...")
 
     async def send_log(self, text: str, *args, **kwargs):
         await self.send_message(

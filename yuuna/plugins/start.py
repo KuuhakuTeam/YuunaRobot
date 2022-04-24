@@ -19,9 +19,7 @@ from pyrogram.types import (
 from yuuna import yuuna, version, START_TIME
 from yuuna.helpers import get_collection, time_formatter
 
-BOT_START = get_collection("BOT_START")
 USERS = get_collection("USERS")
-
 
 START_PRIVADO = """
 𝙷𝚒 𝚠𝚎𝚕𝚌𝚘𝚖𝚎, 𝙸'𝚖 𝚈𝚞𝚞𝚗𝚊 𝚊 𝙻𝚊𝚜𝚝𝙵𝙼 𝚜𝚌𝚛𝚘𝚋𝚋𝚕𝚎𝚛 𝚊𝚖𝚘𝚗𝚐 𝚘𝚝𝚑𝚎𝚛 𝚏𝚞𝚗𝚌𝚝𝚒𝚘𝚗𝚜
