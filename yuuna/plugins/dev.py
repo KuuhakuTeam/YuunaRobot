@@ -172,7 +172,6 @@ async def terminal(client: yuuna, message: Message):
 """.format(
                         err
                     ),
-                    parse_mode="markdown",
                 )
             output += "**{}**\n".format(code)
             output += process.stdout.read()[:-1].decode("utf-8")
@@ -192,7 +191,6 @@ async def terminal(client: yuuna, message: Message):
             )
             await message.reply_text(
                 """**Error:**\n```{}```""".format("".join(errors)),
-                parse_mode="markdown",
             )
             return
         output = process.stdout.read()[:-1].decode("utf-8")
@@ -211,6 +209,6 @@ async def terminal(client: yuuna, message: Message):
             )
             os.remove(filename)
             return
-        await message.reply_text(f"**Output:**\n```{output}```", parse_mode="markdown")
+        await message.reply_text(f"**Output:**\n```{output}```")
     else:
         await message.reply_text("**Output:**\n`No Output`")
