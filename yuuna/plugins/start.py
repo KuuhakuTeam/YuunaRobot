@@ -10,12 +10,14 @@ import asyncio
 
 from typing import Union
 from pyrogram import filters
+from pyrogram.enums import ChatType
 from pyrogram.types import (
     CallbackQuery,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     Message,
 )
+
 from yuuna import yuuna, version, START_TIME
 from yuuna.helpers import get_collection, time_formatter
 
@@ -48,7 +50,7 @@ async def start_(c: yuuna, m: Union[Message, CallbackQuery]):
     msg = START_PRIVADO
     gifstart = "https://telegra.ph/file/32663a402ed3beaea526b.jpg"
     if isinstance(m, Message):
-        if not m.chat.type == "ChatType.PRIVATE":
+        if not m.chat.type == ChatType.PRIVATE:
             return
         await c.send_photo(m.chat.id, gifstart, caption=msg, reply_markup=keyboard)
         user_id = m.from_user.id
