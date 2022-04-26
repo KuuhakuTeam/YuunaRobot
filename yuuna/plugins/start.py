@@ -72,7 +72,7 @@ async def start_(c: yuuna, m: Union[Message, CallbackQuery]):
     if isinstance(m, CallbackQuery):
         await c.edit_message_caption(
             chat_id=m.message.chat.id,
-            message_id=m.message.message_id,
+            message_id=m.message.id,
             caption=msg,
             reply_markup=keyboard
         )
@@ -97,7 +97,7 @@ async def infos(c: yuuna, m: CallbackQuery):
         )
     await c.edit_message_caption(
         chat_id=m.message.chat.id,
-        message_id=m.message.message_id,
+        message_id=m.message.id,
         caption=info_text,
         reply_markup=button
     )
