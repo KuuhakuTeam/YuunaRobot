@@ -6,6 +6,7 @@
 # <https://www.github.com/KuuhakuTeam/YuunaRobot/blob/master/LICENSE/>.
 
 from typing import Union
+from pyrogram.enums import ChatType
 from pyrogram import filters
 from pyrogram.types import (
     CallbackQuery,
@@ -74,7 +75,7 @@ async def help_(c: yuuna, m: Union[Message, CallbackQuery]):
         ]
     )
     if isinstance(m, Message):
-        if m.chat.type == "private":
+        if m.chat.type == ChatType.PRIVATE:
             await m.reply(
                   HELP_TEXT,
                   reply_markup=button
