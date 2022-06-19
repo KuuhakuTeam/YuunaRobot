@@ -29,7 +29,8 @@ GROUPS = get_collection("GROUPS")
 REG = get_collection("REG")
 
 
-@yuuna.on_message(filters.command(["lt", "lastfm"]) & filters.regex(pattern=r"^status$"))
+@yuuna.on_message(filters.command("status", prefixes=""))
+@yuuna.on_message(filters.command(["lt", "lastfm"]))
 async def now_play(c: yuuna, message: Message):
     if message.chat.type == (ChatType.SUPERGROUP or ChatType.GROUP):
         if not await find_gp(message.chat.id):
