@@ -6,6 +6,7 @@
 # <https://www.github.com/KuuhakuTeam/YuunaRobot/blob/master/LICENSE/>.
 
 from .db import get_collection
+from .core import *
 from .decorators import input_str
 from .tools import is_dev, time_formatter
 from .aiohttp import AioHttp as get_response

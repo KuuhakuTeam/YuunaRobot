@@ -53,5 +53,11 @@ class YuunaRobot(Client):
             **kwargs,
         )
 
+    async def send_err(self, e: str):
+        await self.send_message(
+            chat_id=Config.GP_LOGS,
+            text="#Yuuna #ERROR #LOGS\n\n{}".format(e)
+        )
+
 
 yuuna = YuunaRobot()

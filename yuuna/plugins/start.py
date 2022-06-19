@@ -20,6 +20,7 @@ from pyrogram.types import (
 
 from yuuna import yuuna, version, START_TIME
 from yuuna.helpers import get_collection, time_formatter
+from yuuna.helpers.core import add_user, find_user
 
 USERS = get_collection("USERS")
 
@@ -53,22 +54,8 @@ async def start_(c: yuuna, m: Union[Message, CallbackQuery]):
         if not m.chat.type == ChatType.PRIVATE:
             return
         await c.send_photo(m.chat.id, gifstart, caption=msg, reply_markup=keyboard)
-        user_id = m.from_user.id
-        fname = m.from_user.first_name
-        uname = m.from_user.username
-        user_start = f"#NEW_USER #LOGS\n\n**User:** {fname}\n**ID:** {m.from_user.id} <a href='tg://user?id={user_id}'>**Link**</a>"
-        if uname:
-            user_start += f"\n**Username:** @{uname}"
-        found = await USERS.find_one({"id_": user_id})
-        if not found:
-            await asyncio.gather(
-                USERS.insert_one({"id_": user_id, "user": fname}),
-                c.send_log(
-                    user_start,
-                    disable_notification=False,
-                    disable_web_page_preview=True,
-                )
-            )
+        if not await find_user(m.from_user.id):
+            await add_user(m)
     if isinstance(m, CallbackQuery):
         await c.edit_message_caption(
             chat_id=m.message.chat.id,

@@ -8,15 +8,18 @@
 import asyncio
 import os
 
+from io import BytesIO
 from telegraph import upload_file
 from wget import download
-from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, InlineQuery, InlineQueryResultPhoto, InlineQueryResultArticle, InputTextMessageContent
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
-from io import BytesIO
+
+from pyrogram import filters
+from pyrogram.enums import ChatType
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, InlineQuery, InlineQueryResultPhoto, InlineQueryResultArticle, InputTextMessageContent
 
 from yuuna import yuuna, Config
-from yuuna.helpers import input_str
+from yuuna.helpers import input_str, add_gp
+from yuuna.helpers.core import find_gp
 from .misc import *
 from yuuna.helpers import get_collection, get_response
 
@@ -26,29 +29,13 @@ GROUPS = get_collection("GROUPS")
 REG = get_collection("REG")
 
 
-@yuuna.on_message(filters.command("status", prefixes=""))
-@yuuna.on_message(filters.command(["lt", "lastfm"]))
+@yuuna.on_message(filters.command(["lt", "lastfm"]) & filters.regex(pattern=r"^status$"))
 async def now_play(c: yuuna, message: Message):
-    user_ = message.from_user
-    user = (f"<a href='tg://user?id={user_.id}'>{user_.first_name}</a>")
-    gid = message.chat.id
-    gp_title = message.chat.title
-    text_add = f"#NEW_GROUP #LOGS\n\n**Grupo**: __{gp_title}__\n**ID:** __{gid}__\n**User:** __{user}__"
-    if message.chat.username:
-        text_add += f"**\nUsername:** @{message.chat.username}"
-    if not await (GROUPS.find_one({"id_": gid})):
-        if message.chat.type == "private":
-            pass
-        else:
-            await asyncio.gather(
-                GROUPS.insert_one({"id_": gid, "title": gp_title}),
-                c.send_log(
-                    text_add,
-                    disable_notification=False,
-                    disable_web_page_preview=True,
-                )
-            )
+    if message.chat.type == (ChatType.SUPERGROUP or ChatType.GROUP):
+        if not await find_gp(message.chat.id):
+            await add_gp(message)
     query = input_str(message)
+    user_ = message.from_user
     lastdb = await REG.find_one({"id_": user_.id})
     if not (lastdb or query):
         button = InlineKeyboardMarkup(
@@ -184,7 +171,7 @@ async def now_play(c: yuuna, message: Message):
 
     # return canvas
     image = BytesIO()
-    canvas.save(image, format="webp")
+    canvas.save(f"image_{user_.id}.jpg", format="jpeg")
     image.seek(0)
     artists = artist_name.replace(" ", "+")
     songs = song_name.replace(" ", "+")
