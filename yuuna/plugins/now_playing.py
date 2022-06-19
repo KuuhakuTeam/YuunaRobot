@@ -31,9 +31,11 @@ REG = get_collection("REG")
 @yuuna.on_message(filters.command("status", prefixes=""))
 @yuuna.on_message(filters.command(["lt", "lastfm"]))
 async def now_play(c: yuuna, message: Message):
-    if (ChatType.SUPERGROUP or ChatType.GROUP):
+    if message.chat.type == (ChatType.SUPERGROUP or ChatType.GROUP):
         if not await find_gp(message.chat.id):
             await add_gp(message)
+    else:
+        pass
     query = input_str(message)
     user_ = message.from_user
     lastdb = await REG.find_one({"id_": user_.id})
