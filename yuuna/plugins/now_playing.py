@@ -8,19 +8,18 @@
 import asyncio
 import os
 
+from .misc import *
 from io import BytesIO
-from telegraph import upload_file
 from wget import download
+from telegraph import upload_file
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 
 from pyrogram import filters
 from pyrogram.enums import ChatType
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, InlineQuery, InlineQueryResultPhoto, InlineQueryResultArticle, InputTextMessageContent
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, InlineQuery, InlineQueryResultArticle, InputTextMessageContent
 
 from yuuna import yuuna, Config
-from yuuna.helpers import input_str, add_gp
-from yuuna.helpers.core import find_gp
-from .misc import *
+from yuuna.helpers import input_str, add_gp, find_gp
 from yuuna.helpers import get_collection, get_response
 
 
@@ -32,7 +31,7 @@ REG = get_collection("REG")
 @yuuna.on_message(filters.command("status", prefixes=""))
 @yuuna.on_message(filters.command(["lt", "lastfm"]))
 async def now_play(c: yuuna, message: Message):
-    if message.chat.type == (ChatType.SUPERGROUP or ChatType.GROUP):
+    if message.chat.type == ChatType.SUPERGROUP or ChatType.GROUP:
         if not await find_gp(message.chat.id):
             await add_gp(message)
     query = input_str(message)
@@ -172,7 +171,7 @@ async def now_play(c: yuuna, message: Message):
 
     # return canvas
     image = BytesIO()
-    canvas.save(f"image_{user_.id}.jpg", format="jpeg")
+    canvas.save(image, format="webp")
     image.seek(0)
     artists = artist_name.replace(" ", "+")
     songs = song_name.replace(" ", "+")
