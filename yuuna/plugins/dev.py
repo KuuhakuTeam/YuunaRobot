@@ -49,7 +49,7 @@ async def broadcasting_(_, message: Message):
         query_ = query
     async for users in ulist:
         try:
-            await yuuna.send_message(chat_id=users["id_"], text=query_, disable_web_page_preview=web_preview, pase_mode=ParseMode.HTML)
+            await yuuna.send_message(chat_id=users["user_id"], text=query_, disable_web_page_preview=web_preview, pase_mode=ParseMode.HTML)
             sucess_br += 1
         except UserIsBlocked:
             block_num += 1
