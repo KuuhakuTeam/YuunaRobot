@@ -56,7 +56,7 @@ async def start_(c: yuuna, m: Union[Message, CallbackQuery]):
         if not await find_user(m.from_user.id):
             await add_user(m.from_user.id)
     if isinstance(m, CallbackQuery):
-        await c.edit_message_caption(
+        await m.edit_message_caption(
             caption=msg,
             reply_markup=keyboard
         )
