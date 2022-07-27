@@ -63,7 +63,7 @@ async def start_(c: yuuna, m: Union[Message, CallbackQuery]):
 
 
 @yuuna.on_callback_query(filters.regex(pattern=r"^infos$"))
-async def infos(c: yuuna, cq: CallbackQuery):
+async def infos(_, cq: CallbackQuery):
     info_text = f"""
 **♬ Bot Info ♪**
 
@@ -79,7 +79,7 @@ async def infos(c: yuuna, cq: CallbackQuery):
                 ]
             ]
         )
-    await c.edit_message_caption(
+    await cq.edit_message_caption(
         caption=info_text,
         reply_markup=button
     )
