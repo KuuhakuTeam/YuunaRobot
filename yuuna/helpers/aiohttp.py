@@ -45,7 +45,8 @@ class AioHttp:
     async def _request(mode: str, session: ClientSession, **kwargs):
         wait = 5 if mode == "status" else 15
         async with session.get(
-            kwargs["link"], params=kwargs["params"], timeout=ClientTimeout(total=wait)
+            kwargs["link"], params=kwargs["params"], timeout=ClientTimeout(
+                total=wait)
         ) as resp:
             if mode == "status":
                 return resp.status

@@ -5,8 +5,7 @@
 # PLease read the GNU v3.0 License Agreement in 
 # <https://www.github.com/KuuhakuTeam/YuunaRobot/blob/master/LICENSE/>.
 
-from .db import get_collection
+from .db import db
 from .core import *
-from .decorators import input_str
-from .tools import is_dev, time_formatter
+from .tools import is_dev, time_formatter, input_str
 from .aiohttp import AioHttp as get_response

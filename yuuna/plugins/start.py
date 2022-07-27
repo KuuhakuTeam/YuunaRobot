@@ -6,7 +6,6 @@
 # <https://www.github.com/KuuhakuTeam/YuunaRobot/blob/master/LICENSE/>.
 
 import time
-import asyncio
 
 from typing import Union
 from pyrogram import filters
@@ -19,10 +18,10 @@ from pyrogram.types import (
 )
 
 from yuuna import yuuna, version, START_TIME
-from yuuna.helpers import get_collection, time_formatter
+from yuuna.helpers import db, time_formatter
 from yuuna.helpers.core import add_user, find_user
 
-USERS = get_collection("USERS")
+USERS = db("USERS")
 
 START_PRIVADO = """
 𝙷𝚒 𝚠𝚎𝚕𝚌𝚘𝚖𝚎, 𝙸'𝚖 𝚈𝚞𝚞𝚗𝚊 𝚊 𝙻𝚊𝚜𝚝𝙵𝙼 𝚜𝚌𝚛𝚘𝚋𝚋𝚕𝚎𝚛 𝚊𝚖𝚘𝚗𝚐 𝚘𝚝𝚑𝚎𝚛 𝚏𝚞𝚗𝚌𝚝𝚒𝚘𝚗𝚜
@@ -55,20 +54,18 @@ async def start_(c: yuuna, m: Union[Message, CallbackQuery]):
             return
         await c.send_photo(m.chat.id, gifstart, caption=msg, reply_markup=keyboard)
         if not await find_user(m.from_user.id):
-            await add_user(m)
+            await add_user(m.from_user.id)
     if isinstance(m, CallbackQuery):
         await c.edit_message_caption(
-            chat_id=m.message.chat.id,
-            message_id=m.message.id,
             caption=msg,
             reply_markup=keyboard
         )
 
 
 @yuuna.on_callback_query(filters.regex(pattern=r"^infos$"))
-async def infos(c: yuuna, m: CallbackQuery):
+async def infos(c: yuuna):
     info_text = f"""
-**♬🎷 Bot Info 🎤●♪**
+**♬ Bot Info ♪**
 
 • **Version:** `{version.__yuuna_version__}`
 • **Uptime:** `{time_formatter(time.time() - START_TIME)}`
@@ -83,8 +80,6 @@ async def infos(c: yuuna, m: CallbackQuery):
             ]
         )
     await c.edit_message_caption(
-        chat_id=m.message.chat.id,
-        message_id=m.message.id,
         caption=info_text,
         reply_markup=button
     )

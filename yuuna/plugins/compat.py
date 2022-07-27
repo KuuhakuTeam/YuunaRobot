@@ -13,33 +13,18 @@ from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from yuuna import yuuna, Config
-from .misc import *
-from yuuna.helpers import get_collection, input_str
+from yuuna.helpers import input_str, find_username, get_username, get_response
 
 
 API = "http://ws.audioscrobbler.com/2.0"
 USER_LAST = "https://last.fm/user/"
-GROUPS = get_collection("GROUPS")
-REG = get_collection("REG")
-
-
-async def resp(params: dict):
-    async with aiohttp.ClientSession() as session, \
-            session.get(API, params=params) as res:
-        return res.status, await res.json()
-
-
-async def recs(query, typ, lim):
-    params = {"method": f"user.get{typ}", "user": query, "limit": lim,
-              "api_key": Config.LASTFM_API_KEY, "format": "json"}
-    return await resp(params)
 
 
 @yuuna.on_message(filters.command("compat"))
 async def lastfm_compat_(_, message: Message):
-    user_ = message.from_user.id
-    lastdb = await REG.find_one({"id_": user_})
-    if lastdb is None:
+    uid = message.from_user.id
+    lastdb = await find_username(uid)
+    if not lastdb:
         button = InlineKeyboardMarkup(
             [
                 [
@@ -53,14 +38,14 @@ async def lastfm_compat_(_, message: Message):
         await message.reply(reg_, reply_markup=button)
         return
     query = input_str(message)
-    user_lastfm = lastdb["last_data"]
+    user_lastfm = await get_username(uid)
     if message.reply_to_message:
         userr_ = message.reply_to_message.from_user.id
-        usrdb = await REG.find_one({"id_": userr_})
-        if usrdb is None:
+        usrdb = await find_username(userr_)
+        if usrdb:
             return await message.reply("__This user has not defined username__")
         else:
-            username = usrdb["last_data"]
+            username = await get_username(userr_)
     elif query:
         username = query
     else:
@@ -83,3 +68,15 @@ async def lastfm_compat_(_, message: Message):
     compat = min((len(comart) * 100 / 40), 100)
     rep = f"{display} both listen: \n__{disart}__...\n\nMusic compatibility is **{compat}%**"
     await msg.edit(rep, disable_web_page_preview=True)
+
+
+async def resp(params: dict):
+    async with aiohttp.ClientSession() as session, \
+            session.get(API, params=params) as res:
+        return res.status, await res.json()
+
+
+async def recs(query, typ, lim):
+    params = {"method": f"user.get{typ}", "user": query, "limit": lim,
+              "api_key": Config.LASTFM_API_KEY, "format": "json"}
+    return await resp(params)

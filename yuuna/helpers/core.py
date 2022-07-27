@@ -7,12 +7,11 @@
 
 import asyncio
 
-from .db import get_collection
+from .db import db
 from yuuna import yuuna
 
-GROUPS = get_collection("GROUPS")
-USERS = get_collection("USERS")
-REG = get_collection("REG")
+GROUPS = db("GROUPS")
+USERS = db("USERS")
 
 
 async def find_user(uid):
@@ -20,19 +19,45 @@ async def find_user(uid):
         return True
 
 
-async def add_user(m):
-    user_start = f"#Yuuna #NEW_USER #LOGS\n\n**User:** {m.from_user.first_name}\n**ID:** {m.from_user.id} <a href='tg://user?id={m.from_user.id}'>**Link**</a>"
+async def add_user(uid, username = None):
     try:
-        await asyncio.gather(
-            USERS.insert_one(
-                {"user_id": m.from_user.id, "user": m.from_user.first_name}
-            ),
-            yuuna.send_log(
-                user_start, disable_notification=False, disable_web_page_preview=True
-            ),
-        )
-    except Exception as e:
-        await yuuna.send_err(e)
+        x = await yuuna.get_users(uid)
+        user_start = f"#Yuuna #New_User\n\n<b>User:</b> {x.mention}\n<b>ID:</b> {x.id}"
+        user = {"user_id": uid}
+        if username == None:
+            await asyncio.gather(
+                USERS.update_one(
+                    user,
+                    {
+                        "user": x.first_name,
+                        "username": username,
+                    },
+                    upsert=True
+                ),
+                yuuna.send_log(user_start),
+            )  
+        else:
+            nick = {"$set": {"username": username}}
+            await USERS.update_one(user, nick, upsert=True)
+    except Exception:
+        pass
+
+
+async def find_username(uid):
+    x = await USERS.find_one({"user_id": uid})
+    if not x:
+        return False
+    try:
+        if x["username"] == None:
+            return False
+    except KeyError:
+        return False
+    return True
+
+
+async def get_username(uid):
+    x = await USERS.find_one({"user_id": uid})
+    return x["username"]
 
 
 # Groups

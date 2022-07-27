@@ -5,7 +5,7 @@
 # PLease read the GNU v3.0 License Agreement in 
 # <https://www.github.com/KuuhakuTeam/YuunaRobot/blob/master/LICENSE/>.
 
-__all__ = ["get_collection"]
+__all__ = ["db"]
 
 import asyncio
 
@@ -29,7 +29,7 @@ else:
 _DATABASE: AgnosticDatabase = _MGCLIENT["yuuna"]
 
 
-def get_collection(name: str) -> AgnosticCollection:
+def db(name: str) -> AgnosticCollection:
     """Create or Get Collection from your database"""
     return _DATABASE[name]
 

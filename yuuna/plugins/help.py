@@ -2,7 +2,7 @@
 # Copyright (C) 2022 KuuhakuTeam
 #
 # This file is a part of < https://github.com/KuuhakuTeam/YuunaRobot/ >
-# PLease read the GNU v3.0 License Agreement in 
+# PLease read the GNU v3.0 License Agreement in
 # <https://www.github.com/KuuhakuTeam/YuunaRobot/blob/master/LICENSE/>.
 
 from typing import Union
@@ -28,15 +28,7 @@ HELP_TEXT = """
 
 
 H_COLLAGE = """
-**Collage help:**
-
-• **Dimensions:** `3x3, 4x4, 5x5`
-• **Period:** `7d, 1m, 3m, 6m, 12m, overall`
-
-**Example:**
-**♬** /collage 4x4 6m
-
-__if you don't set any parameters the default value will always be 3x3 7d__
+**Feature removed.**
 """
 
 
@@ -46,7 +38,6 @@ H_COMPAT = """
 __With compat you can find out which artists both users listen to__
 
 **♬** /compat (reply to a user) or username - checks its compatibility with mentioned user.
-
 **♬** /compat username1 username2 - checks compatibility between 2 users that you want.
 """
 
@@ -67,7 +58,8 @@ async def help_(c: yuuna, m: Union[Message, CallbackQuery]):
         [
             [
                 InlineKeyboardButton("Collage", callback_data="help_collage"),
-                InlineKeyboardButton("Compatibility", callback_data="help_compat")
+                InlineKeyboardButton(
+                    "Compatibility", callback_data="help_compat")
             ],
             [
                 InlineKeyboardButton("Scrobble", callback_data="help_scrobble")
@@ -76,60 +68,48 @@ async def help_(c: yuuna, m: Union[Message, CallbackQuery]):
     )
     if isinstance(m, Message):
         if m.chat.type == ChatType.PRIVATE:
-            await m.reply(
-                  HELP_TEXT,
-                  reply_markup=button
-              )
+            await m.reply(HELP_TEXT, reply_markup=button)
         else:
-            msg = "Contact me in private"
             keyboard = InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton("Commands", url=f"https://t.me/{c.me.username}?start=help_")
+                        InlineKeyboardButton(
+                            "Commands", url=f"https://t.me/{c.me.username}?start=help_")
                     ]
                 ]
-              )
-            await m.reply(
-                  msg,
-                  reply_markup=keyboard
-              )
-    elif isinstance(m, CallbackQuery):
+            )
+            await m.reply("Contact me in private", reply_markup=keyboard)
+    if isinstance(m, CallbackQuery):
         await m.edit_message_text(text=HELP_TEXT, reply_markup=button)
 
 
-@yuuna.on_callback_query(filters.regex(pattern=r"^help_collage$"))
+@yuuna.on_callback_query(filters.regex(pattern=r"help\_(.*)"))
 async def help_colla(_, cb: CallbackQuery):
+    data, string = cb.data.split("_")
+    if string == "collage":
+        msg = H_COLLAGE
+    if string == "scrobble":
+        msg = H_SCROB
+    if string == "compat":
+        msg = H_COMPAT
     button = InlineKeyboardMarkup(
         [[InlineKeyboardButton("Back", callback_data="help_back")]]
     )
-    await cb.edit_message_text(text=H_COLLAGE, reply_markup=button)
+    await cb.edit_message_text(text=msg, reply_markup=button)
 
-@yuuna.on_callback_query(filters.regex(pattern=r"^help_compat$"))
-async def help_scro(_, cb: CallbackQuery):
-    button = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("Back", callback_data="help_back")]]
-    )
-    await cb.edit_message_text(text=H_COMPAT, reply_markup=button)
-
-@yuuna.on_callback_query(filters.regex(pattern=r"^help_scrobble$"))
-async def help_andro(_, cb: CallbackQuery):
-    button = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("Back", callback_data="help_back")]]
-    )
-    await cb.edit_message_text(text=H_SCROB, reply_markup=button)
 
 @yuuna.on_message(filters.command("about"))
 async def start_(_, m: Message):
     buttons = InlineKeyboardMarkup(
-    [
         [
-            InlineKeyboardButton("Lazy dev", url="https://t.me/fnixdev"),
-            InlineKeyboardButton("Support", url="https://t.me/fnixsup"),
-        ],
-        [
-            InlineKeyboardButton("Repository", url="https://github.com/KuuhakuTeam/YuunaRobot")
+            [
+                InlineKeyboardButton("Lazy dev", url="https://t.me/fnixdev"),
+                InlineKeyboardButton("Support", url="https://t.me/fnixsup"),
+            ],
+            [
+                InlineKeyboardButton(
+                    "Repository", url="https://github.com/KuuhakuTeam/YuunaRobot")
+            ]
         ]
-    ]
     )
     await m.reply_animation("https://telegra.ph/file/4026209b29ecc9da5f1d4.gif", caption="𝚜𝚘𝚖𝚎 𝚘𝚏 𝚖𝚢 𝚏𝚞𝚗𝚌𝚝𝚒𝚘𝚗𝚜 𝚖𝚊𝚢 𝚌𝚘𝚗𝚝𝚊𝚒𝚗 𝚋𝚞𝚐𝚜, 𝚖𝚢 𝚍𝚎𝚟𝚎𝚕𝚘𝚙𝚎𝚛 𝚒𝚜 𝚕𝚊𝚣𝚢 𝚙𝚕𝚜 𝚋𝚎 𝚙𝚊𝚝𝚒𝚎𝚗𝚝", reply_markup=buttons)
-

@@ -23,3 +23,6 @@ def time_formatter(seconds: float) -> str:
 def is_dev(user_id: int) -> bool:
     """retorna se é dev ou não"""
     return user_id in Config.DEV_USERS
+
+def input_str(message) -> str:
+    return " ".join(message.text.split()[1:])

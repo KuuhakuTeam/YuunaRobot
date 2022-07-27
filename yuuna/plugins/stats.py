@@ -7,15 +7,16 @@
 
 
 from pyrogram import filters
+from pyrogram.errors import ChatWriteForbidden
 from pyrogram.types import Message
 
 from yuuna import yuuna
-from yuuna.helpers import get_collection, is_dev, add_gp, del_gp, find_gp
+from yuuna.helpers import db, is_dev, add_gp, del_gp, find_gp
 
 
-USERS = get_collection("USERS")
-GROUPS = get_collection("GROUPS")
-REG = get_collection("REG")
+USERS = db("USERS")
+GROUPS = db("GROUPS")
+
 
 @yuuna.on_message(filters.command(["stats", "status"]))
 async def status_(_, m: Message):
@@ -24,21 +25,22 @@ async def status_(_, m: Message):
         return
     glist = await GROUPS.estimated_document_count()
     ulist = await USERS.estimated_document_count()
-    rlist = await REG.estimated_document_count()
-    await m.reply(f"**【 Bot Status ♪ 】**\n\n**Users**: __{ulist}__\n**Reg Users**: __{rlist}__\n**Groups**: __{glist}__")
+    await m.reply(f"**【 Bot Status 】**\n\n**Users**: __{ulist}__\n**Groups**: __{glist}__")
 
 
-@yuuna.on_message(filters.new_chat_members)
+@yuuna.on_message(filters.new_chat_members & filters.group)
 async def thanks_for(c: yuuna, m: Message):
     if c.me.id in [x.id for x in m.new_chat_members]:
-        await c.send_message(
-            chat_id=m.chat.id,
-            text=("**print('**__Hi guys. Thanks for adding me to the group, report bugs and errors at -> @fnixsup__**')**"),
-            disable_notification=True,
-        )
         if not await find_gp(m.chat.id):
             await add_gp(m)
-
+        try:
+            await c.send_message(
+                chat_id=m.chat.id,
+                text=("**print('**__Hi guys. Thanks for adding me to the group, report bugs and errors at -> @fnixsup__**')**"),
+                disable_notification=True,
+            )
+        except ChatWriteForbidden:
+            print("\n[ ERROR ] Bot cannot send messages\n")
 
 @yuuna.on_message(filters.left_chat_member)
 async def left_chat_(c: yuuna, m: Message):

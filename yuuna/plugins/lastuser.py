@@ -8,8 +8,8 @@
 from __future__ import nested_scopes
 
 import requests
+import asyncio
 
-from cgitb import text
 from bs4 import BeautifulSoup as bs
 
 from pyrogram import filters
@@ -17,16 +17,32 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from yuuna import yuuna, Config
 from .misc import *
-from yuuna.helpers import get_collection, get_response, input_str
+from yuuna.helpers import db, get_response, input_str, find_user, add_user, find_username, get_username
 
 API = "http://ws.audioscrobbler.com/2.0"
-REG = get_collection("REG")
+
+
+@yuuna.on_message(filters.command(["set", "reg"]))
+async def last_save_user(_, message: Message):
+    uid = message.from_user.id
+    if not await find_user(uid):
+        await add_user(uid)
+        await asyncio.sleep(1)
+    query = input_str(message)
+    if not query:
+        await message.reply("__Use /set username.__")
+        return
+    await asyncio.gather(
+        add_user(uid, query),
+        message.reply("__Your username has been successfully set.__")
+    )
+
 
 @yuuna.on_message(filters.command(["profile", "user"]))
 async def now_play(c: yuuna, message: Message):
     user_ = message.from_user
     query = input_str(message)
-    lastdb = await REG.find_one({"id_": user_.id})
+    lastdb = await find_username(user_.id)
     if not (lastdb or query or message.reply_to_message):
         button = InlineKeyboardMarkup(
             [
@@ -37,20 +53,20 @@ async def now_play(c: yuuna, message: Message):
                 ]
             ]
         )
-        reg_ = "__Enter some username or use /set (username) to set yours. If you don't already have a LastFM account, click the button below to register.__"
+        reg_ = "__Enter some username, reply user or use /set (username) to set yours. If you don't already have a LastFM account, click the button below to register.__"
         await message.reply(reg_, reply_markup=button)
         return
     if message.reply_to_message:
         userr_ = message.reply_to_message.from_user.id
-        usrdb = await REG.find_one({"id_": userr_})
-        if usrdb is None:
+        usrdb = await find_username(userr_)
+        if not usrdb:
             return await message.reply("__This user has not defined username__")
         else:
-            user_lastfm = usrdb["last_data"]
+            user_lastfm = await get_username(userr_)
     elif query:
         user_lastfm = query
     else:
-        user_lastfm = lastdb["last_data"]
+        user_lastfm = await get_username(user_.id)
     params = {
         "method": "user.getinfo",
         "user": user_lastfm,

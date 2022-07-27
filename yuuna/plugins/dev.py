@@ -10,14 +10,21 @@ import traceback
 import subprocess
 from datetime import datetime
 
+from git import Repo
+from git.exc import GitCommandError, InvalidGitRepositoryError
+
 from pyrogram import filters
+from pyrogram.enums import ParseMode
 from pyrogram.types import Message
 from pyrogram.errors import UserIsBlocked
+
 from yuuna import yuuna, START_TIME
-from yuuna.helpers import is_dev, time_formatter, input_str, get_collection
+from yuuna.helpers import is_dev, time_formatter, input_str, db
 
 
-USERS = get_collection("USERS")
+REPO_ = "https://github.com/KuuhakuTeam/YuunaRobot"
+BRANCH_ = "master"
+USERS = db("USERS")
 
 
 @yuuna.on_message(filters.command(["broadcast", "bc"]))
@@ -42,7 +49,7 @@ async def broadcasting_(_, message: Message):
         query_ = query
     async for users in ulist:
         try:
-            await yuuna.send_message(chat_id= users["id_"], text=query_, disable_web_page_preview=web_preview)
+            await yuuna.send_message(chat_id=users["id_"], text=query_, disable_web_page_preview=web_preview, pase_mode=ParseMode.HTML)
             sucess_br += 1
         except UserIsBlocked:
             block_num += 1
@@ -57,6 +64,7 @@ async def broadcasting_(_, message: Message):
 │- __Failed:__ `{no_sucess}`
 ╰❑
     """)
+
 
 @yuuna.on_message(filters.command(["ping", "pingu"]))
 async def ping_(_, message: Message):
@@ -76,17 +84,40 @@ async def restart_(_, message: Message):
     os.execv(sys.executable, [sys.executable, "-m", "yuuna"])
 
 
-@yuuna.on_message(filters.command("up"))
-async def restart_(_, message: Message):
-    user_id = message.from_user.id
-    if not is_dev(user_id):
+@yuuna.on_message(filters.command("update"))
+async def updating_(_, message: Message):
+    if not is_dev(message.from_user.id):
         return
-    process = subprocess.Popen(["git", "pull"], stdout=subprocess.PIPE)
-    output = process.communicate()[0]
-    kek = await message.reply(f"`{output}`")
-    await asyncio.sleep(3)
-    await kek.edit("`Restarting...`")
-    os.execv(sys.executable, [sys.executable, "-m", "yuuna"])
+    msg_ = await message.reply("<i>Updating Please Wait!</i>")
+    try:
+        repo = Repo()
+    except GitCommandError:
+        return await msg_.edit("<i>Invalid Git Command</i>")
+    except InvalidGitRepositoryError:
+        repo = Repo.init()
+        if "upstream" in repo.remotes:
+            origin = repo.remote("upstream")
+        else:
+            origin = repo.create_remote("upstream", REPO_)
+        origin.fetch()
+        repo.create_head(BRANCH_, origin.refs.master)
+        repo.heads.master.set_tracking_branch(origin.refs.master)
+        repo.heads.master.checkout(True)
+    if repo.active_branch.name != BRANCH_:
+        return await msg_.edit("error")
+    try:
+        repo.create_remote("upstream", REPO_)
+    except BaseException:
+        pass
+    ups_rem = repo.remote("upstream")
+    ups_rem.fetch(BRANCH_)
+    try:
+        ups_rem.pull(BRANCH_)
+    except GitCommandError:
+        repo.git.reset("--hard", "FETCH_HEAD")
+    await msg_.edit("<i>Updated Sucessfully! Give Me A min To Restart!</i>")
+    args = [sys.executable, "-m", "gardevoir"]
+    os.execle(sys.executable, *args, os.environ)
 
 
 @yuuna.on_message(filters.command("eval", prefixes=["/", "!"]))
