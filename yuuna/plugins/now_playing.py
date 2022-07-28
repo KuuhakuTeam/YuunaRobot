@@ -2,7 +2,7 @@
 # Copyright (C) 2022 KuuhakuTeam
 #
 # This file is a part of < https://github.com/KuuhakuTeam/YuunaRobot/ >
-# PLease read the GNU v3.0 License Agreement in 
+# PLease read the GNU v3.0 License Agreement in
 # <https://www.github.com/KuuhakuTeam/YuunaRobot/blob/master/LICENSE/>.
 
 import asyncio
@@ -17,13 +17,11 @@ from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, InlineQuery, InlineQueryResultArticle, InputTextMessageContent, InlineQueryResultPhoto
 
 from yuuna import yuuna, Config
-from yuuna.helpers import add_gp, add_user, find_gp, find_user, find_username, get_username
+from yuuna.helpers import add_gp, add_user, find_gp, find_username, get_username
 from yuuna.helpers import db, get_response
 
 
 API = "http://ws.audioscrobbler.com/2.0"
-GROUPS = db("GROUPS")
-REG = db("REG")
 
 
 @yuuna.on_message(filters.command("status", prefixes=""))
@@ -45,7 +43,7 @@ async def now_play(c: yuuna, message: Message):
                 ]
             ]
         )
-        await message.reply("__Enter some username or use /set (username) to set yours. If you don't already have a LastFM account, click the button below to register.__", reply_markup=button)
+        await message.reply("__Use /set (username) to set your lastfm username. If you don't already have a LastFM account, click the button below to register.__", reply_markup=button)
         return
     user_lastfm = await get_username(user.id)
 
@@ -84,8 +82,13 @@ async def now_play(c: yuuna, message: Message):
         view_data_ = await get_response.json(link=API, params=params_)
         get_track = view_data_["track"]
         get_scrob = int(get_track["userplaycount"])
+        if get_scrob == 0:
+            scrob = get_scrob + 1
+        else:
+            scrob = get_scrob
+        listening = f"is listening for {scrob}th time"
     except KeyError:
-        pass
+        listening = "is listening"
     if image_:
         img_ = download(image_, Config.DOWN_PATH)
     else:
@@ -100,7 +103,8 @@ async def now_play(c: yuuna, message: Message):
     else:
         pfp = 'yuuna/plugins/misc/pic.jpg'
 
-    image = draw_scrobble(img_, pfp, song_name, artist_name, user_lastfm, get_scrob, loved)
+    image = draw_scrobble(img_, pfp, song_name, artist_name,
+                          user_lastfm, listening, loved)
     prof = f"https://www.last.fm/user/{user_lastfm}"
     link_ = f'https://www.youtube.com/results?search_query={str(song_name).replace(" ", "+")}+{str(artist_name).replace(" ", "+")}'
     button_ = InlineKeyboardMarkup(
@@ -153,9 +157,9 @@ async def now_play(c: yuuna, cb: InlineQuery):
                 )
             )
             return await cb.answer(
-                        results=results,
-                        cache_time=1
-                    )
+                results=results,
+                cache_time=1
+            )
         if "error" in view_data:
             results.append(
                 InlineQueryResultArticle(
@@ -164,9 +168,9 @@ async def now_play(c: yuuna, cb: InlineQuery):
                 )
             )
             return await cb.answer(
-                        results=results,
-                        cache_time=1
-                    )
+                results=results,
+                cache_time=1
+            )
         recent_song = view_data["recenttracks"]["track"]
         if len(recent_song) == 0:
             results.append(
@@ -176,9 +180,9 @@ async def now_play(c: yuuna, cb: InlineQuery):
                 )
             )
             return await cb.answer(
-                        results=results,
-                        cache_time=1
-                    )
+                results=results,
+                cache_time=1
+            )
         song_ = recent_song[0]
         song_name = song_["name"]
         artist_name = song_["artist"]["name"]
@@ -193,27 +197,20 @@ async def now_play(c: yuuna, cb: InlineQuery):
         }
         try:
             view_data_ = await get_response.json(link=API, params=params_)
-        except ValueError:
-            results.append(
-                InlineQueryResultArticle(
-                    title="Error",
-                    thumb_url="https://telegra.ph/file/21581612f3170612568dd.jpg",
-                )
-            )
-            return await cb.answer(
-                        results=results,
-                        cache_time=1
-                    )
-        get_track = view_data_["track"]
-        get_scrob = int(get_track["userplaycount"])
-        if get_scrob == 0:
-            scrob = get_scrob + 1
-        else:
-            scrob =  get_scrob  
+            get_track = view_data_["track"]
+            get_scrob = int(get_track["userplaycount"])
+            if get_scrob == 0:
+                scrob = get_scrob + 1
+            else:
+                scrob = get_scrob
+            listening = f"is listening for {scrob}th time"
+        except KeyError:
+            listening = "is listening"
         if image_:
             img_ = download(image_)
         else:
-            img_ = download("https://telegra.ph/file/328131bd27e0cb8969b31.png")
+            img_ = download(
+                "https://telegra.ph/file/328131bd27e0cb8969b31.png")
         loved = int(song_["loved"])
 
         # User Photo
@@ -223,42 +220,42 @@ async def now_play(c: yuuna, cb: InlineQuery):
         else:
             pfp = 'yuuna/plugins/misc/pic.jpg'
 
-        image = draw_scrobble(img_, pfp, song_name, artist_name, user_lastfm, scrob, loved)
+        image = draw_scrobble(img_, pfp, song_name,
+                              artist_name, user_lastfm, listening, loved)
         response = upload_file(image)
         inquery = f"https://telegra.ph{response[0]}"
         await asyncio.sleep(0.5)
         prof = f"https://www.last.fm/user/{user_lastfm}"
         link_ = f'https://www.youtube.com/results?search_query={str(song_name).replace(" ", "+")}+{str(artist_name).replace(" ", "+")}'
         button_ = InlineKeyboardMarkup(
-        [
             [
-                InlineKeyboardButton(
-                    "🔎 Youtube", url=link_
-                ),
-                InlineKeyboardButton(
-                    "👤 Profile", url=prof
-                ),
-                InlineKeyboardButton(
-                    "↗️ Share", switch_inline_query=""
-                ),
+                [
+                    InlineKeyboardButton(
+                        "🔎 Youtube", url=link_
+                    ),
+                    InlineKeyboardButton(
+                        "👤 Profile", url=prof
+                    ),
+                    InlineKeyboardButton(
+                        "↗️ Share", switch_inline_query=""
+                    ),
+                ]
             ]
-        ]
-    )
+        )
         # send pic
         results.append(
             InlineQueryResultPhoto(
-                title="Sucess",
+                title=listening,
                 thumb_url=inquery,
                 photo_url=inquery,
                 description="Now Playing",
                 reply_markup=button_
             )
         )
-
         await cb.answer(
-                    results=results,
-                    cache_time=0,
-                )
+            results=results,
+            cache_time=0,
+        )
         try:
             os.remove(img_)
             os.remove(pfp)
@@ -285,6 +282,6 @@ async def now_play(c: yuuna, cb: InlineQuery):
             )
         )
         await cb.answer(
-                    results=results,
-                    cache_time=1
-                )
+            results=results,
+            cache_time=1
+        )

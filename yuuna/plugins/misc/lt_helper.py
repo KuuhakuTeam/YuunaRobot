@@ -40,7 +40,7 @@ def draw_scrobble(
     song_name: str,
     artist_name: str,
     user_lastfm: str,
-    scrobbles: int,
+    listening: str,
     loved: bool):
         # background object
         canvas = Image.new("RGB", (600, 250), (18, 18, 18))
@@ -83,7 +83,7 @@ def draw_scrobble(
         white = '#ffffff'
         draw.text((248, 18), truncate(user_lastfm, poppins, 250),
                 fill=white, font=poppins)
-        draw.text((248, 53), f"is listening for {scrobbles}th time",
+        draw.text((248, 53), listening,
                 fill=white, font=open_sans)
         draw.text((248, 115), truncate(song_name, songfont, 315),
                 fill=white, font=songfont)
