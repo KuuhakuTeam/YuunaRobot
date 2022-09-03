@@ -13,4 +13,4 @@ from yuuna import yuuna
 
 @yuuna.on_message(filters.command(["collage"]))
 async def collage_(_, message: Message):
-    return await message.reply("**Feature removed.**")
+    return await message.reply("<b>Feature removed.</b>")

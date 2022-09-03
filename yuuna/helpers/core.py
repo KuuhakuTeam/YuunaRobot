@@ -2,43 +2,38 @@
 # Copyright (C) 2022 KuuhakuTeam
 #
 # This file is a part of < https://github.com/KuuhakuTeam/YuunaRobot/ >
-# PLease read the GNU v3.0 License Agreement in 
+# PLease read the GNU v3.0 License Agreement in
 # <https://www.github.com/KuuhakuTeam/YuunaRobot/blob/master/LICENSE/>.
 
 import asyncio
 
-from .db import db
-from yuuna import yuuna
+from yuuna import yuuna, db
 
-GROUPS = db("GROUPS")
-USERS = db("USERS")
+GROUPS = db["GROUPS"]
+USERS = db["USERS"]
 
 
+# User
 async def find_user(uid):
     if await USERS.find_one({"user_id": uid}):
         return True
 
 
-async def add_user(uid, username = None):
+async def update_user(uid, username):
     try:
-        x = await yuuna.get_users(uid)
-        user_start = f"#Yuuna #New_User\n\n<b>User:</b> {x.mention}\n<b>ID:</b> {x.id}"
-        user = {"user_id": uid}
-        if username == None:
-            await asyncio.gather(
-                USERS.update_one(
-                    user,
-                    {
-                        "user": x.first_name,
-                        "username": username,
-                    },
-                    upsert=True
-                ),
-                yuuna.send_log(user_start),
-            )  
-        else:
-            nick = {"$set": {"username": username}}
-            await USERS.update_one(user, nick, upsert=True)
+        await USERS.update_one({"user_id": uid}, {"$set": {"username": username}}, upsert=True)
+    except Exception:
+        pass
+
+
+async def add_user(uid):
+    try:
+        user = await yuuna.get_users(uid)
+        user_start = f"#Yuuna #New_User\n\n<b>User:</b> {user.mention}\n<b>ID:</b> {user.id}"
+        await asyncio.gather(
+            USERS.update_one({"user_id": uid}, {"$set": {"user": user.first_name}}, upsert=True),
+            yuuna.send_log(user_start),
+        )
     except Exception:
         pass
 

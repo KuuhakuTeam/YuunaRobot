@@ -17,8 +17,7 @@ from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, InlineQuery, InlineQueryResultArticle, InputTextMessageContent, InlineQueryResultPhoto
 
 from yuuna import yuuna, Config
-from yuuna.helpers import add_gp, add_user, find_gp, find_username, get_username
-from yuuna.helpers import db, get_response
+from yuuna.helpers import add_gp, add_user, find_gp, find_username, get_username, get_response
 
 
 API = "http://ws.audioscrobbler.com/2.0"
@@ -43,7 +42,7 @@ async def now_play(c: yuuna, message: Message):
                 ]
             ]
         )
-        await message.reply("__Use /set (username) to set your lastfm username. If you don't already have a LastFM account, click the button below to register.__", reply_markup=button)
+        await message.reply("<i>Use /set (username) to set your lastfm username. If you don't already have a LastFM account, click the button below to register.</i>", reply_markup=button)
         return
     user_lastfm = await get_username(user.id)
 
@@ -60,12 +59,10 @@ async def now_play(c: yuuna, message: Message):
     try:
         view_data = await get_response.json(link=API, params=params)
     except ValueError:
-        return await message.reply("__Error. Make sure you entered the correct username__")
-    if "error" in view_data:
-        return await message.reply(view_data["error"])
+        return await message.reply("<i>Error. Make sure you entered correct username</i>")
     recent_song = view_data["recenttracks"]["track"]
     if len(recent_song) == 0:
-        return await message.reply("__You don't scrobble any music__")
+        return await message.reply("<i>You don't scrobble any music</i>")
     song_ = recent_song[0]
     song_name = song_["name"]
     artist_name = song_["artist"]["name"]
@@ -127,7 +124,7 @@ async def now_play(c: yuuna, message: Message):
     try:
         os.remove(img_)
         os.remove(pfp)
-        os.remove(image)
+        os.system("rm *.jpg")
     except FileNotFoundError:
         pass
 
@@ -152,7 +149,7 @@ async def now_play(c: yuuna, cb: InlineQuery):
         except ValueError:
             results.append(
                 InlineQueryResultArticle(
-                    title="Error. Make sure you entered the correct username",
+                    title="Error. Make sure you entered correct username",
                     thumb_url="https://telegra.ph/file/21581612f3170612568dd.jpg",
                 )
             )
@@ -163,7 +160,7 @@ async def now_play(c: yuuna, cb: InlineQuery):
         if "error" in view_data:
             results.append(
                 InlineQueryResultArticle(
-                    title="Error. Make sure you entered the correct username",
+                    title="Error. Make sure you entered correct username",
                     thumb_url="https://telegra.ph/file/21581612f3170612568dd.jpg",
                 )
             )
@@ -259,7 +256,7 @@ async def now_play(c: yuuna, cb: InlineQuery):
         try:
             os.remove(img_)
             os.remove(pfp)
-            os.remove(image)
+            os.system("rm *.jpg")
         except FileNotFoundError:
             pass
     else:

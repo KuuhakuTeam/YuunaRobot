@@ -13,7 +13,7 @@ from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from yuuna import yuuna, Config
-from yuuna.helpers import input_str, find_username, get_username, get_response
+from yuuna.helpers import input_str, find_username, get_username
 
 
 API = "http://ws.audioscrobbler.com/2.0"
@@ -34,7 +34,7 @@ async def lastfm_compat_(_, message: Message):
                 ]
             ]
         )
-        reg_ = "__It looks like you haven't set your username\nUse /set (username) to set it. If you don't already have a LastFM account, click the button below to register.__"
+        reg_ = "<i>It looks like you haven't set your username\nUse /set (username) to set it. If you don't already have a LastFM account, click the button below to register.</i>"
         await message.reply(reg_, reply_markup=button)
         return
     query = input_str(message)
@@ -43,30 +43,30 @@ async def lastfm_compat_(_, message: Message):
         userr_ = message.reply_to_message.from_user.id
         usrdb = await find_username(userr_)
         if usrdb:
-            return await message.reply("__This user has not defined username__")
+            return await message.reply("<i>This user has not defined username</i>")
         else:
             username = await get_username(userr_)
     elif query:
         username = query
     else:
-        return await message.reply("__I need you to enter username or reply to a message__")
-    msg = await message.reply("__Processing..__")
+        return await message.reply("<i>I need you to enter username or reply to a message</i>")
+    msg = await message.reply("<i>Processing..</i>")
     us1, us2 = user_lastfm, username
     ta = "topartists"
     try:
         ta1 = (await recs(us1, ta, 500))[1][ta]["artist"]
     except KeyError:
-        return await msg.edit(f"__Could not find {us1} user__.")
+        return await msg.edit(f"<i>Could not find {us1} user</i>.")
     try:
         ta2 = (await recs(us2, ta, 500))[1][ta]["artist"]
     except KeyError:
-        return await msg.edit(f"__Could not find {us2} user__.")
+        return await msg.edit(f"<i>Could not find {us2} user.</i>")
     ad1, ad2 = [n["name"] for n in ta1], [n["name"] for n in ta2]
-    display = f"**[{us1}]({USER_LAST}{us1})** and **[{us2}]({USER_LAST}{us2})**"
+    display = f"<i>[{us1}]({USER_LAST}{us1})</b> and <b>[{us2}]({USER_LAST}{us2})</b>"
     comart = [value for value in ad2 if value in ad1]
     disart = ", ".join({comart[r] for r in range(min(len(comart), 5))})
     compat = min((len(comart) * 100 / 40), 100)
-    rep = f"{display} both listen: \n__{disart}__...\n\nMusic compatibility is **{compat}%**"
+    rep = f"{display} both listen: \n<i>{disart}</i>...\n\nMusic compatibility is <i>{compat}%</b>"
     await msg.edit(rep, disable_web_page_preview=True)
 
 

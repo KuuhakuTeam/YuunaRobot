@@ -18,13 +18,13 @@ from pyrogram.enums import ParseMode
 from pyrogram.types import Message
 from pyrogram.errors import UserIsBlocked
 
-from yuuna import yuuna, START_TIME
-from yuuna.helpers import is_dev, time_formatter, input_str, db
+from yuuna import yuuna, START_TIME, db
+from yuuna.helpers import is_dev, time_formatter, input_str
 
 
 REPO_ = "https://github.com/KuuhakuTeam/YuunaRobot"
 BRANCH_ = "master"
-USERS = db("USERS")
+USERS = db["USERS"]
 
 
 @yuuna.on_message(filters.command(["broadcast", "bc"]))
@@ -34,8 +34,8 @@ async def broadcasting_(_, message: Message):
         return
     query = input_str(message)
     if not query:
-        return await message.reply("__I need text to broadcasting.__")
-    msg = await message.reply("__Processing ...__")
+        return await message.reply("<i>I need text to broadcasting.</i>")
+    msg = await message.reply("<i>Processing ...</i>")
     web_preview = False
     sucess_br = 0
     no_sucess = 0
@@ -57,11 +57,11 @@ async def broadcasting_(_, message: Message):
             no_sucess += 1
     await asyncio.sleep(2)
     await msg.edit(f"""
-╭─❑ 「 **Broadcast Completed** 」 ❑──
-│- __Total Users:__ `{total_user}`
-│- __Successful:__ `{sucess_br}`
-│- __Blocked:__ `{block_num}`
-│- __Failed:__ `{no_sucess}`
+╭─❑ 「 <b>Broadcast Completed</b> 」 ❑──
+│- <i>Total Users:</i> `{total_user}`
+│- <i>uccessful:</i> `{sucess_br}`
+│- <i>Blocked:</i> `{block_num}`
+│- <i>Failed:</i> `{no_sucess}`
 ╰❑
     """)
 
@@ -80,7 +80,7 @@ async def restart_(_, message: Message):
     user_id = message.from_user.id
     if not is_dev(user_id):
         return
-    await message.reply("__Restarting...__")
+    await message.reply("<i>Restarting...<i>")
     os.execv(sys.executable, [sys.executable, "-m", "yuuna"])
 
 
@@ -125,7 +125,7 @@ async def eval_(client: yuuna, message: Message):
     user_id = message.from_user.id
     if not is_dev(user_id):
         return
-    status_message = await message.reply_text("__Processing ...__")
+    status_message = await message.reply_text("<i>Processing ...</i>")
     cmd = message.text[len(message.text.split()[0]) + 1:]
     reply_to_ = message
     if message.reply_to_message:
@@ -181,7 +181,7 @@ async def terminal(client: yuuna, message: Message):
     if not is_dev(user_id):
         return
     if len(message.text.split()) == 1:
-        await message.reply_text("Usage: `/term echo owo`")
+        await message.reply_text("Usage: <code>/term echo owo</code>")
         return
     args = message.text.split(None, 1)
     teks = args[1]
@@ -198,8 +198,8 @@ async def terminal(client: yuuna, message: Message):
                 print(err)
                 await message.reply_text(
                     """
-**Error:**
-```{}```
+<b>Error:</b>
+<pre>{}</pre>
 """.format(
                         err
                     ),
@@ -221,7 +221,7 @@ async def terminal(client: yuuna, message: Message):
                 etype=exc_type, value=exc_obj, tb=exc_tb
             )
             await message.reply_text(
-                """**Error:**\n```{}```""".format("".join(errors)),
+                """<b>Error:</b><pre>{}</pre>""".format("".join(errors)),
             )
             return
         output = process.stdout.read()[:-1].decode("utf-8")
@@ -236,10 +236,10 @@ async def terminal(client: yuuna, message: Message):
                 message.chat.id,
                 filename,
                 reply_to_message_id=message.message_id,
-                caption="`Output file`",
+                caption="<code>Output file</code>",
             )
             os.remove(filename)
             return
-        await message.reply_text(f"**Output:**\n```{output}```")
+        await message.reply_text(f"<b>Output:</b>\n<pre>{output}</pre>")
     else:
-        await message.reply_text("**Output:**\n`No Output`")
+        await message.reply_text("<b>Output:</b>\n<code>No Output</code>")

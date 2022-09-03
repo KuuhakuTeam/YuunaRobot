@@ -17,11 +17,10 @@ from pyrogram.types import (
     Message,
 )
 
-from yuuna import yuuna, version, START_TIME
-from yuuna.helpers import db, time_formatter
-from yuuna.helpers.core import add_user, find_user
+from yuuna import yuuna, version, START_TIME, db
+from yuuna.helpers import time_formatter, add_user, find_user
 
-USERS = db("USERS")
+USERS = db["USERS"]
 
 START_PRIVADO = """
 𝙷𝚒 𝚠𝚎𝚕𝚌𝚘𝚖𝚎, 𝙸'𝚖 𝚈𝚞𝚞𝚗𝚊 𝚊 𝙻𝚊𝚜𝚝𝙵𝙼 𝚜𝚌𝚛𝚘𝚋𝚋𝚕𝚎𝚛 𝚊𝚖𝚘𝚗𝚐 𝚘𝚝𝚑𝚎𝚛 𝚏𝚞𝚗𝚌𝚝𝚒𝚘𝚗𝚜
@@ -65,12 +64,12 @@ async def start_(c: yuuna, m: Union[Message, CallbackQuery]):
 @yuuna.on_callback_query(filters.regex(pattern=r"^infos$"))
 async def infos(_, cq: CallbackQuery):
     info_text = f"""
-**♬ Bot Info ♪**
+<b>♬ Bot Info</b>
 
-• **Version:** `{version.__yuuna_version__}`
-• **Uptime:** `{time_formatter(time.time() - START_TIME)}`
-• **Python:** `{version.__python_version__}`
-• **Pyrogram:** `{version.__pyro_version__}`
+♪ <b>Version:</b> <code>{version.__yuuna_version__}</code>
+♪ <b>Uptime:</b> <code>{time_formatter(time.time() - START_TIME)}</code>
+♪ <b>Python:</b> <code>{version.__python_version__}</code>
+♪ <b>Pyrogram:</b> <code>{version.__pyro_version__}</code>
 """
     button = InlineKeyboardMarkup(
             [

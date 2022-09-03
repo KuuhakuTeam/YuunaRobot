@@ -18,36 +18,36 @@ from yuuna import yuuna
 
 
 HELP_TEXT = """
-**Basic commands:**
+<b>Basic commands:<b>
 
-**♬** /lt - show what you're listening to
-**♬** /set - set your lastfm username 
-**♬** /ping - check if bot is online 
-**♬** /about - bot information and more 
+<b>♬</b> /lt - show what you're listening to
+<b>♬</b> /set - set your lastfm username 
+<b>♬</b> /ping - check if bot is online 
+<b>♬</b> /about - bot information and more 
 """
 
 
 H_COLLAGE = """
-**Feature removed.**
+<b>Feature removed.</b>
 """
 
 
 H_COMPAT = """
-**Check your music compatibility**
+<b>Check your music compatibility</b>
 
-__With compat you can find out which artists both users listen to__
+<i>With compat you can find out which artists both users listen to</i>
 
-**♬** /compat (reply to a user) or username - checks its compatibility with mentioned user.
-**♬** /compat username1 username2 - checks compatibility between 2 users that you want.
+<b>♬</b> /compat (reply to a user) or username - checks its compatibility with mentioned user.
+<b>♬</b> /compat username1 username2 - checks compatibility between 2 users that you want.
 """
 
 
 H_SCROB = """
-**Scrobbles commands**
+<b>Scrobbles commands<b>
 
-**♬** /lt or /lt username - shows what you or a user is listening to
-**♬** /set username - set your lastfm username 
-**♬** /user username - verify a user's information
+<b>♬</b> /lt or status - shows what you is listening to
+<b>♬</b> /set username - set your lastfm username 
+<b>♬</b> /user or /user username - verify your or user information
 """
 
 
