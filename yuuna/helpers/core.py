@@ -30,6 +30,8 @@ async def add_user(uid):
     try:
         user = await yuuna.get_users(uid)
         user_start = f"#Yuuna #New_User\n\n<b>User:</b> {user.mention}\n<b>ID:</b> {user.id}"
+        if user.username:
+            user_start += f"<b>Username:</b> @{user.username}"
         await asyncio.gather(
             USERS.update_one({"user_id": uid}, {"$set": {"user": user.first_name}}, upsert=True),
             yuuna.send_log(user_start),

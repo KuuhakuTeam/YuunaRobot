@@ -235,7 +235,7 @@ async def terminal(client: yuuna, message: Message):
             await client.send_document(
                 message.chat.id,
                 filename,
-                reply_to_message_id=message.message_id,
+                reply_to_message_id=message.id,
                 caption="<code>Output file</code>",
             )
             os.remove(filename)
